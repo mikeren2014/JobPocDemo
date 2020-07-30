@@ -16,12 +16,11 @@ namespace JobPocDemo.Jobs
 
         #region methods
 
-        public async Task<IEnumerable<IJob>> RunAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<IJob>> GetAsync(CancellationToken cancellationToken = default)
         {
             await DoSomeWorkAsync(1, $"Copying product info CatalogProductId={CatalogProductId}...", cancellationToken)
                 .ConfigureAwait(false);
 
-            // Run Sequential
             return new IJob[]
                    {
                        new CopyPriceJob
@@ -30,6 +29,19 @@ namespace JobPocDemo.Jobs
                                .ToString()
                        }
                    };
+        }
+
+        public async Task RunAsync(CancellationToken cancellationToken = default)
+        {
+            await DoSomeWorkAsync(1, $"Copying product info CatalogProductId={CatalogProductId}...", cancellationToken)
+                .ConfigureAwait(false);
+
+            await new CopyPriceJob
+                  {
+                      Sku = NewGuid()
+                          .ToString()
+                  }.RunAsync(cancellationToken)
+                   .ConfigureAwait(false);
         }
 
         #endregion

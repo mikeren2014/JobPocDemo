@@ -35,7 +35,7 @@ namespace JobPocDemo
                     await ensureCreatedContext.Database.EnsureCreatedAsync(cancellationTokenSource.Token)
                                               .ConfigureAwait(false);
 
-                    await jobService.DemoSequentialAsync(cancellationTokenSource.Token)
+                    await jobService.DemoRunSequentialAsync(cancellationTokenSource.Token)
                                     .ConfigureAwait(false);
 
                     await jobService.DemoExecuteFromQueueAsync(cancellationTokenSource.Token)
@@ -47,7 +47,8 @@ namespace JobPocDemo
                                     .ConfigureAwait(false);
                 }
 
-                WriteLine("Done");
+                WriteLine();
+                WriteLine("All Done!!");
             }
             catch (Exception exception)
             {

@@ -16,13 +16,15 @@ namespace JobPocDemo.Jobs
 
         #region methods
 
-        public async Task<IEnumerable<IJob>> RunAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<IJob>> GetAsync(CancellationToken cancellationToken = default)
         {
             await DoSomeWorkAsync(1, $"Coping Components: CatalogComponentId: {CatalogComponentId}", cancellationToken)
                 .ConfigureAwait(false);
 
             return Enumerable.Empty<IJob>();
         }
+
+        public Task RunAsync(CancellationToken cancellationToken = default) => DoSomeWorkAsync(1, $"Coping Components: CatalogComponentId: {CatalogComponentId}", cancellationToken);
 
         #endregion
     }

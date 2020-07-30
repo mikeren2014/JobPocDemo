@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using JobPocDemo.Data;
 using JobPocDemo.Jobs;
-using JobPocDemo.Jobs.Extensions;
 using Taylor.UFP.XCore.Json.Extensions;
 using static System.Console;
 
@@ -15,17 +14,22 @@ namespace JobPocDemo
 
         public async Task DemoExecuteFromQueueAsync(CancellationToken cancellationToken = default)
         {
-            var dequeuedJob = await DeQueueAsync(cancellationToken)
-                                  .ConfigureAwait(false);
-
-            if (dequeuedJob is null)
-                return;
-
-            foreach (var job in await dequeuedJob.RunAsync(cancellationToken)
-                                                 .ConfigureAwait(false))
+            while (true)
             {
-                await SaveJobAsync(job, cancellationToken)
-                    .ConfigureAwait(false);
+                var dequeuedJob = await DeQueueAsync(cancellationToken)
+                                      .ConfigureAwait(false);
+
+                if (dequeuedJob is null)
+                    break;
+
+                foreach (var job in await dequeuedJob.GetAsync(cancellationToken)
+                                                     .ConfigureAwait(false))
+                {
+                    await SaveJobAsync(job, cancellationToken)
+                        .ConfigureAwait(false);
+                }
+
+                await Task.Delay(1000, cancellationToken);
             }
         }
 
@@ -33,14 +37,14 @@ namespace JobPocDemo
             new CopyAccountJob
             {
                 AccountId = 123
-            }.FullRunAsync(cancellationToken);
+            }.RunAsync(cancellationToken);
 
-        public async Task DemoSequentialAsync(CancellationToken cancellationToken = default)
+        public async Task DemoRunSequentialAsync(CancellationToken cancellationToken = default)
         {
             foreach (var job in await new CopyAccountJob
                                       {
                                           AccountId = 123
-                                      }.RunAsync(cancellationToken)
+                                      }.GetAsync(cancellationToken)
                                        .ConfigureAwait(false))
             {
                 await SaveJobAsync(job, cancellationToken)
@@ -57,6 +61,9 @@ namespace JobPocDemo
 
             if (firstJob is null)
                 return null;
+
+            WriteLine();
+            WriteLine($"Deque job: {firstJob.Type}");
 
             dbContext.JobItems.Remove(firstJob);
 
