@@ -8,7 +8,8 @@ namespace JobPocDemo.Jobs
     {
         #region methods
 
-        Task<IEnumerable<IJob>> RunAsync(CancellationToken cancellationToken = default);
+        Task<IEnumerable<IJob>> GetAsync(CancellationToken cancellationToken = default);
+        Task RunAsync(CancellationToken cancellationToken = default);
 
         #endregion
     }
